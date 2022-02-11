@@ -21,9 +21,12 @@ SET time_zone = "+00:00";
 --
 -- Database: `playerdata`
 --
-CREATE DATABASE IF NOT EXISTS `playerdata` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE DATABASE IF NOT EXISTS `playerdata`;
 USE `playerdata`;
 
+/*
+  API permissions
+*/
 CREATE TABLE `apiPermissions` (
   `id` int NOT NULL AUTO_INCREMENT,
   `permission` text NOT NULL,
@@ -62,6 +65,18 @@ CREATE TABLE `apiUserPerms` (
   CONSTRAINT `FK_apiUserPerms_apiUser` FOREIGN KEY (`user_id`) REFERENCES `apiUser` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB AUTO_INCREMENT=71 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+CREATE TABLE `Tokens` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `player_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `token` varchar(50) NOT NULL,
+  `request_highscores` tinyint(1) NOT NULL DEFAULT '0',
+  `verify_ban` tinyint(1) NOT NULL DEFAULT '0',
+  `create_token` tinyint(1) NOT NULL DEFAULT '0',
+  `verify_players` tinyint(1) NOT NULL DEFAULT '0',
+  `discord_general` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 CREATE TABLE `Labels` (
   `id` int NOT NULL AUTO_INCREMENT,
   `label` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -73,6 +88,39 @@ CREATE TABLE `labelsJagex` (
   `id` int NOT NULL DEFAULT '0',
   `label` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `regionIDNames` (
+  `entry_ID` int NOT NULL AUTO_INCREMENT,
+  `region_ID` int NOT NULL,
+  `z_axis` int DEFAULT '0',
+  `region_name` text NOT NULL,
+  PRIMARY KEY (`entry_ID`),
+  UNIQUE KEY `region_ID` (`region_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=27167 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*
+  tables with references
+*/
+CREATE TABLE `Players` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` text NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL,
+  `possible_ban` tinyint(1) NOT NULL DEFAULT '0',
+  `confirmed_ban` tinyint(1) NOT NULL DEFAULT '0',
+  `confirmed_player` tinyint(1) NOT NULL DEFAULT '0',
+  `label_id` int NOT NULL DEFAULT '0',
+  `label_jagex` int NOT NULL DEFAULT '0',
+  `ironman` tinyint DEFAULT NULL,
+  `hardcore_ironman` tinyint DEFAULT NULL,
+  `ultimate_ironman` tinyint DEFAULT NULL,
+  `normalized_name` text,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `Unique_name` (`name`(50)),
+  KEY `FK_label_id` (`label_id`),
+  KEY `confirmed_ban_idx` (`confirmed_ban`),
+  KEY `normal_name_index` (`normalized_name`(50)),
+  CONSTRAINT `FK_label_id` FOREIGN KEY (`label_id`) REFERENCES `Labels` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB AUTO_INCREMENT=49350066 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `playerHiscoreData` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -357,28 +405,6 @@ CREATE TABLE `playerHiscoreDataXPChange` (
   CONSTRAINT `fk_phd_xp_pl` FOREIGN KEY (`Player_id`) REFERENCES `Players` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB AUTO_INCREMENT=310304838 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `Players` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` text NOT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT NULL,
-  `possible_ban` tinyint(1) NOT NULL DEFAULT '0',
-  `confirmed_ban` tinyint(1) NOT NULL DEFAULT '0',
-  `confirmed_player` tinyint(1) NOT NULL DEFAULT '0',
-  `label_id` int NOT NULL DEFAULT '0',
-  `label_jagex` int NOT NULL DEFAULT '0',
-  `ironman` tinyint DEFAULT NULL,
-  `hardcore_ironman` tinyint DEFAULT NULL,
-  `ultimate_ironman` tinyint DEFAULT NULL,
-  `normalized_name` text,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `Unique_name` (`name`(50)),
-  KEY `FK_label_id` (`label_id`),
-  KEY `confirmed_ban_idx` (`confirmed_ban`),
-  KEY `normal_name_index` (`normalized_name`(50)),
-  CONSTRAINT `FK_label_id` FOREIGN KEY (`label_id`) REFERENCES `Labels` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE=InnoDB AUTO_INCREMENT=49350066 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
 CREATE TABLE `PlayersChanges` (
   `id` int NOT NULL AUTO_INCREMENT,
   `ChangeDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -453,15 +479,6 @@ CREATE TABLE `PredictionsFeedback` (
   CONSTRAINT `Subject_ID` FOREIGN KEY (`subject_id`) REFERENCES `Players` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `Voter_ID` FOREIGN KEY (`voter_id`) REFERENCES `Players` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB AUTO_INCREMENT=582901 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-CREATE TABLE `regionIDNames` (
-  `entry_ID` int NOT NULL AUTO_INCREMENT,
-  `region_ID` int NOT NULL,
-  `z_axis` int DEFAULT '0',
-  `region_name` text NOT NULL,
-  PRIMARY KEY (`entry_ID`),
-  UNIQUE KEY `region_ID` (`region_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=27167 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `reportLatest` (
   `report_id` bigint DEFAULT NULL,
@@ -547,18 +564,6 @@ CREATE TABLE `stgReports` (
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=299822712 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `Tokens` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `player_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `token` varchar(50) NOT NULL,
-  `request_highscores` tinyint(1) NOT NULL DEFAULT '0',
-  `verify_ban` tinyint(1) NOT NULL DEFAULT '0',
-  `create_token` tinyint(1) NOT NULL DEFAULT '0',
-  `verify_players` tinyint(1) NOT NULL DEFAULT '0',
-  `discord_general` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
 CREATE TABLE `xx_stats` (
   `player_count` bigint NOT NULL DEFAULT '0',
   `confirmed_ban` tinyint(1) NOT NULL DEFAULT '0',
@@ -567,7 +572,9 @@ CREATE TABLE `xx_stats` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-
+/*
+  Triggers & events
+*/
 CREATE DEFINER=`master_admin`@`%` EVENT `event_prune_playerHiscoreData` ON SCHEDULE EVERY 1 HOUR STARTS '2022-01-14 14:00:00' ON COMPLETION NOT PRESERVE ENABLE DO begin
 delete from playerdata.playerHiscoreData
 where id in (
