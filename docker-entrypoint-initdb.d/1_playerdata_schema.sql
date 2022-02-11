@@ -30,16 +30,6 @@ CREATE TABLE `apiPermissions` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `apiUsage` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `user_id` int NOT NULL,
-  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `route` text,
-  PRIMARY KEY (`id`),
-  KEY `FK_apiUsage_apiUser` (`user_id`),
-  CONSTRAINT `FK_apiUsage_apiUser` FOREIGN KEY (`user_id`) REFERENCES `apiUser` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE=InnoDB AUTO_INCREMENT=50173 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
 CREATE TABLE `apiUser` (
   `id` int NOT NULL AUTO_INCREMENT,
   `username` tinytext NOT NULL,
@@ -50,6 +40,16 @@ CREATE TABLE `apiUser` (
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `apiUsage` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `route` text,
+  PRIMARY KEY (`id`),
+  KEY `FK_apiUsage_apiUser` (`user_id`),
+  CONSTRAINT `FK_apiUsage_apiUser` FOREIGN KEY (`user_id`) REFERENCES `apiUser` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB AUTO_INCREMENT=50173 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `apiUserPerms` (
   `id` int NOT NULL AUTO_INCREMENT,
