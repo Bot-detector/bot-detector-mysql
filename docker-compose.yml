@@ -6,7 +6,9 @@ services:
       dockerfile: Dockerfile
     image: bot-detector/bd-mysql:latest
     environment:
-      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_ROOT_PASSWORD=root_bot_buster
+      - MYSQL_USER=botssuck
+      - MYSQL_PASSWORD=botdetector
     volumes:
       - ../bot-detector-mysql/mount:/var/lib/mysql 
       - '../bot-detector-mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d'
