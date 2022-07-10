@@ -7,8 +7,8 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=root_bot_buster
     volumes:
-      - ./mount:/var/lib/mysql
       - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - ./mount:/var/lib/mysql
     ports:
       - "127.0.0.1:3306:3306"
     networks:
