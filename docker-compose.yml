@@ -3,7 +3,7 @@ services:
   mysql:
     build:
       context: .
-    image: bot-detector/mysql:latest
+    image: mysql
     environment:
       - MYSQL_ROOT_PASSWORD=root_bot_buster
     volumes:
@@ -16,3 +16,4 @@ services:
 
 networks:
   botdetector-network:
+ 
